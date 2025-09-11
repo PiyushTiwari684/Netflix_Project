@@ -28,6 +28,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/user/v1", userRoute);
+app.get('/',(req,res)=>{
+  res.send({
+    activeStatus:true,
+    error:false,
+  });
+})
 
 app.use(error);
 
