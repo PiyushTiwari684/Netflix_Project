@@ -1,4 +1,6 @@
-export const API_END_POINT = "http://localhost:8000/user/v1";
+// export const API_END_POINT = "http://localhost:8000/user/v1";
+export const API_END_POINT = "https://netflix-project-2obi.vercel.app/";
+
 
 // export const options = {
 //   method: "GET",
