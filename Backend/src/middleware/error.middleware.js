@@ -1,22 +1,33 @@
-const error = (err,req,res,next) =>{
-       if(err.name === "validation error"){
-        err.statusCode = 400;
-        err.message = Object.values(err.errors).map((ele)=>ele.message);
-       }
+const errorMiddleware = (err, req, res, next) => {
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
 
-       if(err.name === "jsonwebTokenErrror"){
-        err.statusCode = 401;
-        err.message = "Please Login Again";
-       }
+  if (err.name === "ValidationError") {
+    statusCode = 400;
+    message = Object.values(err.errors)
+      .map((e) => e.message)
+      .join(", ");
+  }
 
-       err.message = err.message || "Internal Server Error From error middleware";
-       err.statusCode =  err.statusCode || 500;
+  if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
+    statusCode = 401;
+    message = "Invalid or expired token. Please login again.";
+  }
 
-       res.status(err.statusCode).json({
-        success:false,
-        message : err.message,
-        errObj : err,
-       });
-}
+  if (err.code === 11000) {
+    statusCode = 409;
+    const field = Object.keys(err.keyValue || {})[0] || "field";
+    message = `${field} already exists`;
+  }
 
-export default error;
+  if (process.env.NODE_ENV !== "production") {
+    console.error("[Error]", err);
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    message,
+  });
+};
+
+export default errorMiddleware;

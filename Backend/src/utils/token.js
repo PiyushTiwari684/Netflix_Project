@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
-import asyncHandler from "express-async-handler";
 
-export const generateToken = asyncHandler(async (id, tokenVersion) => {
-    console.log(id, tokenVersion);
-    
-  let token = jwt.sign({ id, tokenVersion }, "Secret-key", {
-    expiresIn: "1d",
-  });
-  return token;
-});
+export const generateToken = (id, tokenVersion) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set in environment variables");
+  }
+  return jwt.sign({ id, tokenVersion }, secret, { expiresIn: "1d" });
+};
